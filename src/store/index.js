@@ -15,8 +15,6 @@ export default new Vuex.Store({
       msg: ''
     }
   },
-  mutations: {
-  },  
   actions: {
     _doLogout({dispatch, state, getters, commit}){
       sessionStorage.clear()
@@ -56,26 +54,5 @@ export default new Vuex.Store({
                 
       })          
     }     
-  },
-  getters: {
-    // checkExist: () => (id, table) => {
-    //   return new Promise((resolve, reject) => {
-    //     axios({
-    //       method: 'GET',
-    //       url: process.env.API_URL + `/?id=${id}&table=${table}`,
-    //       data: (body.data) ? body.data : null,
-    //       headers: {
-    //         'Content-Type': (body.data) ? 'application/x-www-form-urlencoded' : null
-    //       },            
-    //       validateStatus: (status) => {
-    //         return true; 
-    //       },
-    //     }).catch(error => {
-    //         reject(error)
-    //     }).then(response => {
-    //         resolve(response)
-    //     })
-    //   })       
-    // },    
-  }  
+  }
 })

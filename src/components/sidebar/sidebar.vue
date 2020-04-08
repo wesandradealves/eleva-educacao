@@ -31,17 +31,7 @@
 				    <md-list-item class="md-inset" @click="$router.push('/dashboard/listar/turmas').catch(err => { return false })">Listar</md-list-item>
 				    <md-list-item class="md-inset" @click="$router.push('/dashboard/adicionar/turmas').catch(err => { return false })">Adicionar</md-list-item>
 				  </md-list>
-				</md-list-item>
-
-				<!-- <md-list-item md-expand>
-				  <md-icon>face</md-icon>
-				  <span class="md-list-item-text">Alunos</span>
-
-				  <md-list slot="md-expand">
-				    <md-list-item class="md-inset" @click="$router.push('/dashboard/listar/alunos').catch(err => { return false })">Listar</md-list-item>
-				    <md-list-item class="md-inset" @click="$router.push('/dashboard/adicionar/alunos').catch(err => { return false })">Adicionar</md-list-item>
-				  </md-list>
-				</md-list-item>	 -->		
+				</md-list-item>		
 			</md-list>	
 			<md-button @click="$store.dispatch('_doLogout')" class="md-raised mt-auto d-block md-secondary">Logout</md-button>			
 		</div>

@@ -40,13 +40,6 @@
             }    
 
             switch($table) {
-                // case 'alunos':
-                //     if($id) {
-
-                //     } else {
-                        
-                //     }
-                // break;
                 case 'escolas':
                    if($id) {
                         $statement = "
@@ -108,24 +101,7 @@
                 $statement = $this->db->prepare($statement);
 
                 switch($table) {
-                    // case 'alunos':
-                    //     if($id) {
-
-                    //     } else {
-                            
-                    //     }
-                    // break;
                     case 'escolas':
-                        // if($id) {
-                        //     $statement->execute(array(
-                        //         'id' => (int) $id,
-                        //         'escola' => $escola
-                        //     ));  
-                        // } else {
-                        //     $statement->execute(array(
-                        //         'escola' => $escola
-                        //     ));                            
-                        // }
                         if($id) {
                             $statement->execute(array(
                                 'id' => (int) $id,
