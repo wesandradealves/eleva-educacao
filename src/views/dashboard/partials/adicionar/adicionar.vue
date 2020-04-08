@@ -17,6 +17,7 @@
             <label>{{field.label}}</label>
             <md-select :required="true" v-model="formFields[field.name]">
               <md-option 
+              :key="option[($route.params.table === 'turmas') ? 'escola' : 'turma']"
               v-for="option in selects[($route.params.table === 'turmas') ? 'escolas' : 'turmas']" 
               :value="option[($route.params.table === 'turmas') ? 'escola' : 'turma']">{{option[($route.params.table === 'turmas') ? 'escola' : 'turma']}}</md-option>
             </md-select>      
@@ -157,66 +158,93 @@ export default {
     },
     submit(e) {
       var vm = this 
-
-      if(this.base64File) {
-        this.formFields['file'] = this.base64File
-      }
-
-      if(this.formFields['password']) {
-        if(this.password !== md5(this.formFields['password'])) {
-          this.formFields['password'] = md5(this.formFields['password'])
-        } else {
-          this.formFields['password'] = this.password
-        }
-      } else {
-        this.formFields['password'] = this.password
-      }
-
-      var body = []
-
-      for (const [key, value] of Object.entries(this.formFields)) {
-        body.push({ [key]:value })
-      }  
-
-      if(this.$route.params.id) {
-        body.push( { id : this.$route.params.id } )
-      } 
-      
-      if(this.$route.params.table) {
-        body.push( { table : this.$route.params.table } )
-      }
+      var filter = ''
 
       this.$store.dispatch('_doRequest', {
-        method: 'POST', 
-        endpoint: process.env.API_URL + ( (this.$route.params.id) ? `?id=${this.$route.params.id}&table=${this.$route.params.table}` : `?table=${this.$route.params.table}` ),
-        data: body,
+        method: 'GET', 
+        endpoint: process.env.API_URL + `/?table=${this.$route.params.table}`,
       }).then(response => {
-        vm.$store.state.err.status = !vm.$store.state.err.status
-        if(response.status === 201) {
-          vm.$store.state.err.title = 'Sucesso'
-          vm.$store.state.err.msg = 'Salvo com sucesso!'     
+        switch(vm.$route.params.table) {
+          case 'users' : 
+            filter = response.data.filter(data=>data.username === vm.formFields['username']).length
+          break;
+          case 'escolas' :
+            filter = response.data.filter(data=>data.escola === vm.formFields['escola']).length
+          break;
+          case 'turmas' :
+            filter = response.data.filter(data=>data.turma === vm.formFields['turma'] && data.escola === vm.formFields['escola']).length
+          break;
+          default:
+          // 
+        }
+        
+        if(!filter) {
+          if(vm.base64File) {
+            vm.formFields['file'] = vm.base64File
+          }
+
+          if(vm.formFields['password']) {
+            if(vm.password !== md5(vm.formFields['password'])) {
+              vm.formFields['password'] = md5(vm.formFields['password'])
+            } else {
+              vm.formFields['password'] = vm.password
+            }
+          } else {
+            vm.formFields['password'] = vm.password
+          }
+
+          var body = []
+
+          for (const [key, value] of Object.entries(vm.formFields)) {
+            body.push({ [key]:value })
+          }  
+
+          if(vm.$route.params.id) {
+            body.push( { id : vm.$route.params.id } )
+          } 
+          
+          if(vm.$route.params.table) {
+            body.push( { table : vm.$route.params.table } )
+          }
+
+          vm.$store.dispatch('_doRequest', {
+            method: 'POST', 
+            endpoint: process.env.API_URL + ( (vm.$route.params.id) ? `?id=${vm.$route.params.id}&table=${vm.$route.params.table}` : `?table=${vm.$route.params.table}` ),
+            data: body,
+          }).then(response => {
+            vm.$store.state.err.status = !vm.$store.state.err.status
+            if(response.status === 201) {
+              vm.$store.state.err.title = 'Sucesso'
+              vm.$store.state.err.msg = 'Salvo com sucesso!'     
+            } else {
+              vm.$store.state.err.title = 'Erro'
+              vm.$store.state.err.msg = 'Ocorreram erros no seu formulário.'          
+            }
+          }, error => {
+            console.log(error)
+          })     
+
+          if(vm.$route.params.table === 'users') {
+            if(parseInt(JSON.parse(sessionStorage.getItem('user')).id) === parseInt(vm.$route.params.id)) {
+              if( vm.formFields['password'] !== JSON.parse(sessionStorage.getItem('user')).password ) {
+                vm.$store.dispatch('_doLogout')
+              } else {
+                vm.$router.replace(`/dashboard/listar/${vm.$route.params.table}`).catch(err => { return false }) 
+              }
+            } else {
+                vm.$router.replace(`/dashboard/listar/${vm.$route.params.table}`).catch(err => { return false }) 
+            }
+          } else {
+            vm.$router.replace(`/dashboard/listar/${vm.$route.params.table}`).catch(err => { return false }) 
+          }
         } else {
+          vm.$store.state.err.status = !vm.$store.state.err.status
           vm.$store.state.err.title = 'Erro'
-          vm.$store.state.err.msg = 'Ocorreram erros no seu formulário.'          
+          vm.$store.state.err.msg = 'Ocorreram erros no seu formulário ou o registro já consta em nosso banco de dados.'            
         }
       }, error => {
         console.log(error)
-      })     
-
-      if(this.$route.params.table === 'users') {
-        if(parseInt(JSON.parse(sessionStorage.getItem('user')).id) === parseInt(this.$route.params.id)) {
-          if( this.formFields['password'] !== JSON.parse(sessionStorage.getItem('user')).password ) {
-            this.$store.dispatch('_doLogout')
-          } else {
-            this.$router.replace(`/dashboard/listar/${this.$route.params.table}`).catch(err => { return false }) 
-          }
-        } else {
-            this.$router.replace(`/dashboard/listar/${this.$route.params.table}`).catch(err => { return false }) 
-        }
-      } else {
-        this.$router.replace(`/dashboard/listar/${this.$route.params.table}`).catch(err => { return false }) 
-      }
-
+      })       
       e.preventDefault()
     },
     handleFile(e) {

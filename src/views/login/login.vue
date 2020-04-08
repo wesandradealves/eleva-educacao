@@ -51,7 +51,7 @@ export default {
       self.timeout = setTimeout(function () {
         self.$store.dispatch('_doRequest', {
           method: 'GET', 
-          endpoint: process.env.API_URL + '/?env=users',
+          endpoint: process.env.API_URL + '/?table=users',
         }).then(response => {
           if(response.data.filter(user=>user.username === self.loginForm.username).length) {
             let user = response.data.filter(user=>user.username === self.loginForm.username)[0]
@@ -72,7 +72,7 @@ export default {
 
       self.$store.dispatch('_doRequest', {
         method: 'GET', 
-        endpoint: process.env.API_URL + '/?env=users',
+        endpoint: process.env.API_URL + '/?table=users',
       }).then(response => {
         self.user = !response.data.filter(user => user.username === self.loginForm.username).length ? response.data.filter(user => user.username === self.loginForm.username) : response.data.filter(user => user.username === self.loginForm.username)[0]
       }, error => {
@@ -88,7 +88,7 @@ export default {
       } else {
         self.$store.dispatch('_doRequest', {
           method: 'GET', 
-          endpoint: process.env.API_URL + '/?env=users',
+          endpoint: process.env.API_URL + '/?table=users',
         }).then(response => {
           if(response.data.filter(user=>user.username === self.loginForm.username).length) {
             let user = response.data.filter(user=>user.username === self.loginForm.username)[0]
